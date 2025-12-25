@@ -201,10 +201,7 @@ export default function Home() {
 
             <div className="flex items-center justify-center gap-6 text-sm animate-fade-in-up animation-delay-300">
               <div className="flex items-center gap-2 text-gray-600 hover:scale-110 smooth-transition cursor-default group/feature">
-                <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl shadow-sm border-2 border-green-200 group-hover/feature:scale-110 smooth-transition">
-                  <span className="text-base">🚚</span>
-                </div>
-                <span className="font-bold">Free Shipping</span>
+             
               </div>
               <div className="flex items-center gap-2 text-gray-600 hover:scale-110 smooth-transition cursor-default group/feature">
                 <div className="p-2 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl shadow-sm border-2 border-blue-200 group-hover/feature:scale-110 smooth-transition">
