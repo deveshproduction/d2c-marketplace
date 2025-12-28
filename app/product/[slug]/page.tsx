@@ -138,7 +138,7 @@ export default function ProductDetailPage() {
           {/* Left Column: Image Gallery */}
           <div className="lg:col-span-7 space-y-4 md:space-y-6">
             <div className="bg-white border border-border p-1 md:p-2 shadow-sm">
-              <div className="relative aspect-[4/3] bg-secondary overflow-hidden">
+              <div className="relative aspect-square bg-secondary overflow-hidden">
                 <Image
                   src={product.image_url}
                   alt={product.name}
@@ -248,7 +248,7 @@ export default function ProductDetailPage() {
                 Browse all assets <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
               {relatedProducts.map(rel => (
                 <ProductCard
                   key={rel.id}

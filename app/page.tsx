@@ -216,7 +216,38 @@ export default function Home() {
 
 
       {/* Main Content Wrapper */}
-      <div className="max-w-[1440px] mx-auto px-6 py-20">
+      <div className="max-w-[1440px] mx-auto px-3 md:px-6 py-10 md:py-20">
+
+        {/* Search Results - Shown only when searching */}
+        {searchQuery && (
+          <div className="mb-16 md:mb-24">
+            <div className="flex items-center gap-3 md:gap-4 mb-8 md:mb-12">
+              <div className="w-1.5 h-8 md:w-2 md:h-10 bg-primary" />
+              <h2 className="font-display text-xl md:text-3xl font-bold text-foreground">Search Results</h2>
+            </div>
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-20 bg-secondary/30 rounded-lg">
+                <Search className="w-12 h-12 text-foreground/10 mx-auto mb-6" />
+                <h3 className="text-xl font-display font-bold text-foreground mb-2">No results matched your search</h3>
+                <p className="text-sm font-bold text-foreground/40 mb-8">Try searching for generic terms like "Mobile" or "TV"</p>
+                <Button onClick={() => { setSearchQuery(''); setSelectedCategory(null); }} className="font-bold bg-primary text-white px-10 rounded-sm">
+                  Show All Products
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onWishlistToggle={toggleWishlist}
+                    isInWishlist={wishlist.has(product.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Featured Categories */}
         <section className="mb-16 md:mb-24">
@@ -251,34 +282,25 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Dynamic Product Feeds */}
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-40 bg-secondary/30 rounded-lg">
-            <Search className="w-12 h-12 text-foreground/10 mx-auto mb-6" />
-            <h3 className="text-xl font-display font-bold text-foreground mb-2">No results matched your search</h3>
-            <p className="text-sm font-bold text-foreground/40 mb-8">Try searching for generic terms like "Mobile" or "TV"</p>
-            <Button onClick={() => { setSearchQuery(''); setSelectedCategory(null); }} className="font-bold bg-primary text-white px-10 rounded-sm">
-              Show All Products
-            </Button>
-          </div>
-        ) : (
-          <>
+        {/* Dynamic Product Collection - Fixed order */}
+        {!searchQuery && (
+          <div className="space-y-16 md:space-y-24">
             {categories.map((category) => {
-              const categoryProducts = filteredProducts.filter(
+              const categoryProducts = products.filter(
                 (p) => p.category_id === category.id
-              );
+              ).slice(0, 10); // Limit to show on homepage
 
               if (categoryProducts.length === 0) return null;
 
               return (
-                <section key={category.id} className="mb-16 md:mb-24 last:mb-0">
+                <section key={category.id}>
                   <div className="flex items-center justify-between mb-6 md:mb-10 pb-4 md:pb-6 border-b border-border">
                     <div>
                       <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground">
                         {category.name}
                       </h2>
                       <p className="text-[10px] md:text-sm text-foreground/30 font-bold uppercase tracking-[2px] md:tracking-[3px] mt-1 md:mt-2">
-                        Curated Selection / {categoryProducts.length} Products
+                        Curated Selection / {category.name} Collections
                       </p>
                     </div>
                     <Link href="#" className="flex items-center gap-2 group text-[10px] md:text-xs font-bold uppercase tracking-widest text-primary">
@@ -286,7 +308,7 @@ export default function Home() {
                     </Link>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
                     {categoryProducts.map((product) => (
                       <ProductCard
                         key={product.id}
@@ -299,7 +321,7 @@ export default function Home() {
                 </section>
               );
             })}
-          </>
+          </div>
         )}
 
         {/* Wishlist Center */}
@@ -315,7 +337,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
               {products
                 .filter(p => wishlist.has(p.id))
                 .map((product) => (
