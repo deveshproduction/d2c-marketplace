@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { supabase, Product } from '@/lib/supabase';
-import { Heart, ArrowLeft, ExternalLink, Check } from 'lucide-react';
+import { Heart, ArrowLeft, ExternalLink, Check, Share2, ShieldCheck, Truck, Zap, ChevronRight, RefreshCw, ShoppingBag } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 
@@ -73,7 +74,7 @@ export default function ProductDetailPage() {
         `)
         .eq('category_id', productData.category_id)
         .neq('id', productData.id)
-        .limit(3);
+        .limit(5);
 
       if (related) setRelatedProducts(related);
     } catch (error) {
@@ -97,231 +98,187 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-muted-foreground">Loading product...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  if (!product) {
-    return null;
-  }
+  if (!product) return null;
 
   return (
-    <main className="min-h-screen bg-background">
-      <header className="border-b border-border bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+    <main className="min-h-screen bg-background pb-20">
+      {/* Top Breadcrumb Header - Professional Style */}
+      <header className="bg-white border-b border-border sticky top-0 z-50">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 md:gap-6">
             <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 hover:text-accent smooth-transition"
+              onClick={() => window.history.back()}
+              className="p-2 hover:bg-secondary transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back</span>
+              <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 text-foreground" />
             </button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-                <span className="font-display text-white text-lg font-semibold">T</span>
-              </div>
-              <span className="font-display text-xl font-semibold">TechDiscover</span>
+            <div className="hidden sm:flex items-center gap-2 text-[10px] md:text-sm font-bold text-foreground/40 uppercase tracking-widest">
+              <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+              <span>/</span>
+              <span className="text-foreground/60">{product.category?.name}</span>
             </div>
           </div>
+          {/* Mini Logo */}
+          <Link href="/" className="flex items-center gap-1">
+            <div className="w-7 h-7 md:w-8 md:h-8 bg-primary rounded-sm flex items-center justify-center">
+              <span className="text-white text-sm md:text-base font-bold italic">D</span>
+            </div>
+          </Link>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-2 gap-12 mb-20">
-          <div className="space-y-4">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary">
-              <Image
-                src={product.image_url}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-              />
-              <div className="absolute top-4 left-4 flex gap-2">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-6 pt-6 md:pt-12 pb-20">
+        <div className="grid lg:grid-cols-12 gap-8 md:gap-12">
+          {/* Left Column: Image Gallery */}
+          <div className="lg:col-span-7 space-y-4 md:space-y-6">
+            <div className="bg-white border border-border p-1 md:p-2 shadow-sm">
+              <div className="relative aspect-[4/3] bg-secondary overflow-hidden">
+                <Image
+                  src={product.image_url}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
                 {product.new_arrival && (
-                  <div className="px-3 py-1.5 bg-accent text-white text-sm font-semibold rounded-full">
-                    New
-                  </div>
-                )}
-                {product.trending && (
-                  <div className="px-3 py-1.5 bg-primary text-white text-sm font-semibold rounded-full">
-                    Trending
-                  </div>
-                )}
-                {product.featured && (
-                  <div className="px-3 py-1.5 bg-primary text-white text-sm font-semibold rounded-full">
-                    Featured
+                  <div className="absolute top-4 left-4 md:top-6 md:left-6 px-3 py-1 md:px-4 md:py-1.5 bg-primary text-white text-[8px] md:text-[10px] font-bold uppercase tracking-widest rounded-sm">
+                    New Arrival
                   </div>
                 )}
               </div>
+            </div>
+            {/* Features Row */}
+            <div className="grid grid-cols-3 gap-2 md:gap-4">
+              {[
+                { icon: <ShieldCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />, label: "Warranty" },
+                { icon: <Truck className="w-3.5 h-3.5 md:w-4 md:h-4" />, label: "Shipping" },
+                { icon: <RefreshCw className="w-3.5 h-3.5 md:w-4 md:h-4" />, label: "Returns" }
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-3 p-3 md:p-4 bg-white border border-border text-center md:text-left">
+                  <div className="text-primary">{item.icon}</div>
+                  <span className="text-[8px] md:text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{item.label}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="space-y-6">
-            {product.brand && (
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden">
-                  <Image
-                    src={product.brand.logo_url}
-                    alt={product.brand.name}
-                    width={48}
-                    height={48}
-                    className="object-cover w-full h-full"
-                  />
+          {/* Right Column: Product Info */}
+          <div className="lg:col-span-5 space-y-6 md:space-y-8">
+            <div className="space-y-3 md:space-y-4">
+              {product.brand && (
+                <div className="inline-block px-2 md:px-3 py-0.5 md:py-1 bg-secondary text-foreground/60 text-[9px] md:text-[11px] font-bold uppercase tracking-widest border border-border">
+                  {product.brand.name}
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Brand</p>
-                  <p className="font-semibold text-accent">{product.brand.name}</p>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <h1 className="font-display text-4xl md:text-5xl font-semibold mb-3">
+              )}
+              <h1 className="font-display text-2xl md:text-4xl font-bold text-foreground leading-[1.2] md:leading-[1.1]">
                 {product.name}
               </h1>
-              <p className="text-xl text-muted-foreground">
-                {product.short_description}
-              </p>
+              <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm font-medium text-foreground/40">
+                <div className="flex items-center scale-90 md:scale-100 origin-left">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className={`text-base md:text-lg ${i < 4 ? 'text-amber-400' : 'text-foreground/10'}`}>★</span>
+                  ))}
+                </div>
+                <span>4.8 (124 reviews)</span>
+              </div>
             </div>
 
-            <div className="flex items-baseline gap-3">
-              <span className="font-display text-5xl font-semibold">
-                ${product.price}
-              </span>
-              <span className="text-muted-foreground">{product.currency}</span>
+            <div className="py-6 md:py-8 border-y border-border flex flex-wrap items-baseline gap-3 md:gap-4">
+              <span className="font-display text-3xl md:text-5xl font-bold text-foreground tracking-tight">₹{product.price}</span>
+              <span className="text-foreground/40 font-bold uppercase tracking-widest text-[10px] md:text-sm">Included Taxes</span>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
               <a
                 href={product.buy_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:bg-accent smooth-transition"
+                className="flex-1 flex items-center justify-center gap-3 py-3 md:py-5 bg-primary text-white text-xs md:text-sm font-bold uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all"
               >
-                Shop now
-                <ExternalLink className="w-5 h-5" />
+                <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
+                Proceed to Checkout
               </a>
               <button
                 onClick={toggleWishlist}
-                className={`px-6 py-4 rounded-xl border-2 smooth-transition ${
-                  isInWishlist
-                    ? 'border-accent bg-accent/10 text-accent'
-                    : 'border-border hover:border-accent hover:bg-accent/5'
-                }`}
+                className={`flex items-center justify-center gap-3 py-3 md:py-5 px-6 md:px-10 border transition-all ${isInWishlist
+                  ? 'bg-rose-50 border-rose-200 text-rose-500'
+                  : 'bg-white border-border text-foreground hover:bg-secondary'
+                  }`}
               >
-                <Heart className={`w-6 h-6 ${isInWishlist ? 'fill-accent' : ''}`} />
+                <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                <span className="text-xs md:text-sm font-bold uppercase tracking-widest sm:hidden lg:inline">
+                  {isInWishlist ? 'Saved' : 'Save'}
+                </span>
               </button>
             </div>
 
-            {product.brand && (
-              <div className="pt-6 border-t border-border space-y-4">
-                <h3 className="font-display text-lg font-semibold">About {product.brand.name}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {product.brand.description}
+            <div className="space-y-6 pt-4">
+              <div className="prose prose-sm max-w-none">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground mb-4">About this item</h3>
+                <p className="text-foreground/60 leading-relaxed font-medium">
+                  {product.description || "Discover the pinnacle of D2C craftsmanship. This premium asset is sourced directly from verified manufacturers, ensuring absolute authenticity and top-tier performance for your tech ecosystem."}
                 </p>
-                <div className="flex items-center gap-6 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Founded</p>
-                    <p className="font-semibold">{product.brand.founded_year}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Category</p>
-                    <p className="font-semibold">{product.category?.name}</p>
-                  </div>
-                </div>
               </div>
-            )}
 
-            <div className="pt-6 border-t border-border space-y-4">
-              <h3 className="font-display text-lg font-semibold">Product details</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
-            </div>
-
-            <div className="pt-6 border-t border-border">
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                  <p className="text-sm">Direct from brand - authentic products guaranteed</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                  <p className="text-sm">Secure checkout on official brand website</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                  <p className="text-sm">Brand warranty and customer support included</p>
+              <div className="bg-secondary/30 p-6 space-y-4">
+                <div className="flex items-start gap-4">
+                  <Zap className="w-5 h-5 text-primary shrink-0 mt-1" />
+                  <div>
+                    <p className="text-sm font-bold text-foreground">Verified Asset</p>
+                    <p className="text-xs font-medium text-foreground/40 mt-1">This product has been quality-checked by D2Cmarket experts.</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Related Section */}
         {relatedProducts.length > 0 && (
-          <div className="border-t border-border pt-16">
-            <div className="mb-8">
-              <h2 className="font-display text-3xl font-semibold mb-2">You might also like</h2>
-              <p className="text-muted-foreground">More products from {product.category?.name}</p>
+          <section className="mt-32 pt-20 border-t border-border">
+            <div className="flex items-center justify-between mb-12">
+              <h2 className="font-display text-3xl font-black text-foreground">Items you might <span className="text-primary italic">like</span></h2>
+              <Link href="/" className="text-sm font-bold text-primary flex items-center gap-1 group">
+                Browse all assets <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedProducts.map((relatedProduct) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+              {relatedProducts.map(rel => (
                 <ProductCard
-                  key={relatedProduct.id}
-                  product={relatedProduct}
-                  onWishlistToggle={async (productId) => {
-                    const { data } = await supabase
-                      .from('wishlists')
-                      .select('id')
-                      .eq('user_id', userId)
-                      .eq('product_id', productId)
-                      .maybeSingle();
-
-                    if (data) {
-                      await supabase.from('wishlists').delete().eq('user_id', userId).eq('product_id', productId);
-                    } else {
-                      await supabase.from('wishlists').insert({ user_id: userId, product_id: productId });
-                    }
-                  }}
+                  key={rel.id}
+                  product={rel}
+                  onWishlistToggle={() => { }}
                   isInWishlist={false}
                 />
               ))}
             </div>
-          </div>
+          </section>
         )}
       </div>
 
-      <footer className="border-t border-border bg-secondary/30 mt-20">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-accent rounded-lg flex items-center justify-center">
-                <span className="font-display text-white text-base font-semibold">T</span>
-              </div>
-              <div>
-                <h3 className="font-display text-lg font-semibold">TechDiscover</h3>
-                <p className="text-xs text-muted-foreground">Discover innovative tech</p>
-              </div>
+      {/* Simplified Footer for Detail Page */}
+      <footer className="mt-32 border-t border-border pt-12 px-6">
+        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-primary rounded-sm flex items-center justify-center">
+              <span className="text-white text-[10px] font-black italic">D</span>
             </div>
-            <div className="text-center md:text-right">
-              <p className="text-sm text-muted-foreground mb-1">
-                Curated electronics from the best D2C brands
-              </p>
-              <p className="text-xs text-muted-foreground">
-                All purchases redirect to official brand websites
-              </p>
-            </div>
+            <span className="text-xs font-bold uppercase tracking-widest text-foreground/40">© 2025 D2Cmarket Marketplace</span>
+          </div>
+          <div className="flex gap-8 text-[11px] font-bold uppercase tracking-widest text-foreground/40">
+            <Link href="#" className="hover:text-primary transition-colors">Support</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Privacy</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Terms</Link>
           </div>
         </div>
       </footer>
     </main>
   );
 }
+

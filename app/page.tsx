@@ -4,10 +4,38 @@ import { useEffect, useState } from 'react';
 import { supabase, Product, Category, Brand } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import SearchBar from '@/components/SearchBar';
-import { Heart, Filter, X } from 'lucide-react';
+import Link from 'next/link';
+import {
+  Heart,
+  ChevronRight,
+  Smartphone,
+  Tv,
+  Headphones,
+  Watch,
+  Laptop,
+  Gamepad,
+  Search,
+  Menu,
+  ShoppingBag,
+  User,
+  Zap,
+  Tag,
+  ShieldCheck,
+  Star
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
+
+const NAV_LINKS = [
+  { name: 'New Arrivals', href: '#' },
+  { name: 'Mobiles', href: '#' },
+  { name: 'TV & Audio', href: '#' },
+  { name: 'Gaming', href: '#' },
+  { name: 'Accessories', href: '#' },
+  { name: 'Daily Deals', href: '#' },
+  { name: 'Best Sellers', href: '#' }
+];
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -18,9 +46,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
-  const [filterType, setFilterType] = useState<'all' | 'featured' | 'trending' | 'new'>('all');
   const [userId] = useState(() => {
     if (typeof window !== 'undefined') {
       let id = localStorage.getItem('userId');
@@ -39,7 +64,7 @@ export default function Home() {
 
   useEffect(() => {
     filterProducts();
-  }, [products, searchQuery, selectedCategory, selectedBrand, filterType]);
+  }, [products, searchQuery, selectedCategory]);
 
   async function fetchData() {
     try {
@@ -53,16 +78,6 @@ export default function Home() {
         supabase.from('brands').select('*'),
         supabase.from('wishlists').select('product_id').eq('user_id', userId)
       ]);
-
-      if (productsRes.error) {
-        console.error('Products error:', productsRes.error);
-      }
-      if (categoriesRes.error) {
-        console.error('Categories error:', categoriesRes.error);
-      }
-      if (brandsRes.error) {
-        console.error('Brands error:', brandsRes.error);
-      }
 
       if (productsRes.data) setProducts(productsRes.data);
       if (categoriesRes.data) setCategories(categoriesRes.data);
@@ -92,20 +107,6 @@ export default function Home() {
       filtered = filtered.filter(p => p.category_id === selectedCategory);
     }
 
-    if (selectedBrand) {
-      filtered = filtered.filter(p => p.brand_id === selectedBrand);
-    }
-
-    if (filterType !== 'all') {
-      if (filterType === 'featured') {
-        filtered = filtered.filter(p => p.featured === true);
-      } else if (filterType === 'trending') {
-        filtered = filtered.filter(p => p.trending === true);
-      } else if (filterType === 'new') {
-        filtered = filtered.filter(p => p.new_arrival === true);
-      }
-    }
-
     setFilteredProducts(filtered);
   }
 
@@ -125,27 +126,12 @@ export default function Home() {
     }
   }
 
-  const clearFilters = () => {
-    setSelectedCategory(null);
-    setSelectedBrand(null);
-    setFilterType('all');
-    setSearchQuery('');
-  };
-
-  const hasActiveFilters = selectedCategory || selectedBrand || filterType !== 'all' || searchQuery;
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <div className="text-center space-y-6 animate-fade-in">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <div className="w-20 h-20 border-4 border-purple-600 border-b-transparent rounded-full animate-spin absolute top-0 left-1/2 -translate-x-1/2" style={{ animationDirection: 'reverse', animationDuration: '1s' }}></div>
-          </div>
-          <div className="space-y-2">
-            <p className="text-2xl font-display font-bold text-gray-900 animate-pulse">Loading Your Discovery Experience</p>
-            <p className="text-sm text-gray-600">Preparing amazing products for you...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm font-bold uppercase tracking-widest text-foreground/40">Opening Marketplace</p>
         </div>
       </div>
     );
@@ -153,170 +139,127 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="border-b border-border glass-effect sticky top-0 z-50 animate-fade-in-down shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 group cursor-pointer">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 smooth-transition shadow-lg">
-                <span className="font-display text-white text-lg font-bold">T</span>
+      {/* Top Professional Header */}
+      <div className="bg-[#1a1a1a] text-[10px] text-white/50 font-bold py-2.5 px-6 hidden sm:block">
+        <div className="max-w-[1440px] mx-auto flex justify-between items-center uppercase tracking-[1.5px]">
+          <div className="flex gap-8">
+            <span className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-primary" /> 100% Secure Checkout</span>
+            <span className="flex items-center gap-2"><Zap className="w-3.5 h-3.5 text-primary" /> Fastest Delivery in Country</span>
+          </div>
+          <div className="flex gap-8">
+            <a href="#" className="hover:text-primary transition-colors">Gift Cards</a>
+            <a href="#" className="hover:text-primary transition-colors">Support Center</a>
+            <a href="#" className="text-primary font-black">Sell on Marketplace</a>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Header - Center Search Focus */}
+      <header className="bg-white border-b border-border sticky top-0 z-50">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 py-3 md:py-5">
+          <div className="flex items-center justify-between gap-4 md:gap-12">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 shrink-0">
+              <div className="w-8 h-8 md:w-9 md:h-9 bg-primary rounded-sm flex items-center justify-center group">
+                <span className="text-white font-bold text-xl md:text-2xl italic">D</span>
               </div>
-              <span className="font-display text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">TechDiscover</span>
+              <span className="font-display text-xl md:text-2xl font-bold tracking-tighter text-foreground">D2C<span className="text-primary">store</span></span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden xl:flex items-center gap-8">
+              {NAV_LINKS.slice(0, 5).map(link => (
+                <a key={link.name} href="#" className="text-[13px] font-bold text-foreground/60 hover:text-primary transition-colors uppercase tracking-wider">
+                  {link.name}
+                </a>
+              ))}
+            </nav>
+
+            {/* Account & Cart */}
+            <div className="flex items-center gap-4 md:gap-6 shrink-0">
+              <button className="flex flex-col items-center gap-0.5 group">
+                <User className="w-4 h-4 md:w-5 md:h-5 text-foreground/70 group-hover:text-primary transition-colors" />
+                <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter text-foreground/40 group-hover:text-primary transition-colors">SignIn</span>
+              </button>
+              <button className="flex flex-col items-center gap-0.5 group relative">
+                <ShoppingBag className="w-4 h-4 md:w-5 md:h-5 text-foreground/70 group-hover:text-primary transition-colors" />
+                <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter text-foreground/40 group-hover:text-primary transition-colors">Cart</span>
+                <span className="absolute -top-1 -right-1 md:-top-1.5 md:-right-1.5 w-3.5 h-3.5 md:w-4 md:h-4 bg-primary text-white text-[8px] md:text-[9px] font-bold flex items-center justify-center rounded-sm">0</span>
+              </button>
             </div>
-            <button
-              onClick={() => {
-                const wishlistSection = document.getElementById('wishlist-section');
-                wishlistSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="relative p-3 rounded-xl hover:bg-blue-50 smooth-transition button-press group/wishlist"
-            >
-              <Heart className="w-5 h-5 text-gray-700 group-hover/wishlist:text-rose-500 smooth-transition group-hover/wishlist:scale-110" />
-              {wishlist.size > 0 && (
-                <span className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs flex items-center justify-center rounded-full font-bold animate-pulse-glow shadow-lg">
-                  {wishlist.size}
-                </span>
-              )}
-            </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="py-12 md:py-20 max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-300 rounded-full mb-6 animate-fade-in-down shadow-lg marketplace-badge cursor-default">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-600"></span>
-              </span>
-              <span className="text-sm font-black text-orange-700 uppercase tracking-wide">🔥 Hot Deals Today</span>
+      {/* Hero Section - Compact & Focused */}
+      <section className="bg-white pt-10 pb-8 md:pt-16 md:pb-12 border-b border-border text-center overflow-hidden">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 relative">
+          {/* Subtle Decorative Accents */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+
+          <div className="max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-secondary border border-border rounded-sm mb-4 md:mb-6">
+              <Tag className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" />
+              <span className="text-[9px] md:text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Summer Sale: Up to 40% Off</span>
             </div>
 
-            <h1 className="font-display text-4xl md:text-6xl font-black mb-8 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-900 bg-clip-text text-transparent leading-tight animate-fade-in-up animation-delay-100">
-              Discover Amazing Products
+            <h1 className="font-display text-4xl md:text-7xl font-bold text-foreground mb-6 md:mb-8 leading-tight tracking-tighter px-2 uppercase">
+              Discovery
             </h1>
 
-            <div className="animate-fade-in-up animation-delay-200 mb-8">
-              <SearchBar onSearch={setSearchQuery} />
-            </div>
-
-            <div className="flex items-center justify-center gap-6 text-sm animate-fade-in-up animation-delay-300">
-              <div className="flex items-center gap-2 text-gray-600 hover:scale-110 smooth-transition cursor-default group/feature">
-             
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 hover:scale-110 smooth-transition cursor-default group/feature">
-                <div className="p-2 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl shadow-sm border-2 border-blue-200 group-hover/feature:scale-110 smooth-transition">
-                  <span className="text-base">💳</span>
-                </div>
-                <span className="font-bold">Secure Payment</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 hover:scale-110 smooth-transition cursor-default group/feature">
-                <div className="p-2 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl shadow-sm border-2 border-orange-200 group-hover/feature:scale-110 smooth-transition">
-                  <span className="text-base">🏷️</span>
-                </div>
-                <span className="font-bold">Best Prices</span>
-              </div>
-            </div>
+            {/* THE MIDDLE SEARCH BAR */}
+            <SearchBar onSearch={setSearchQuery} />
           </div>
         </div>
+      </section>
 
-        <div className="flex items-center justify-between mb-8 pb-4 border-b border-border animate-fade-in animation-delay-400">
-          <div className="flex gap-2 flex-wrap">
-            {['all', 'featured', 'trending', 'new'].map((type, index) => (
-              <button
-                key={type}
-                onClick={() => setFilterType(type as any)}
-                className={`px-5 py-2.5 rounded-full text-sm font-semibold smooth-transition button-press ${
-                  filterType === type
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl'
-                    : 'bg-secondary text-secondary-foreground hover:bg-blue-50 hover:text-blue-600 hover:scale-105'
-                }`}
-                style={{ animationDelay: `${500 + index * 50}ms` }}
-              >
-                {type === 'all' ? 'All' : type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
+
+
+      {/* Main Content Wrapper */}
+      <div className="max-w-[1440px] mx-auto px-6 py-20">
+
+        {/* Featured Categories */}
+        <section className="mb-16 md:mb-24">
+          <div className="flex items-center justify-between mb-8 md:mb-12">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-1.5 h-8 md:w-2 md:h-10 bg-primary" />
+              <h2 className="font-display text-xl md:text-3xl font-bold text-foreground">Explore Departments</h2>
+            </div>
+            <Link href="#" className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest text-primary transition-all">
+              View All <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4">
+            {[
+              { name: 'Smartphones', icon: <Smartphone />, count: '240+ Deals' },
+              { name: 'TV & Video', icon: <Tv />, count: '180+ Deals' },
+              { name: 'Laptops', icon: <Laptop />, count: '120+ Deals' },
+              { name: 'Audio Gear', icon: <Headphones />, count: '310+ Deals' },
+              { name: 'Wearables', icon: <Watch />, count: '150+ Deals' },
+              { name: 'Gaming', icon: <Gamepad />, count: '90+ Deals' }
+            ].map((cat) => (
+              <div key={cat.name} className="group relative bg-white border border-border p-5 md:p-8 text-center cursor-pointer transition-all hover:bg-primary/[0.02]">
+                <div className="mb-4 md:mb-6 text-foreground/20 group-hover:text-primary transition-colors transform group-hover:-translate-y-1 duration-300">
+                  {cat.icon && <div className="w-8 h-8 md:w-10 md:h-10 mx-auto flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">{cat.icon}</div>}
+                </div>
+                <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-foreground mb-1">{cat.name}</h3>
+                <p className="text-[8px] md:text-[10px] font-bold text-foreground/30 uppercase tracking-tighter">{cat.count}</p>
+                <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-primary group-hover:w-full transition-all duration-500" />
+              </div>
             ))}
           </div>
-          <Button
-            onClick={() => setShowFilters(!showFilters)}
-            variant="outline"
-            className="h-11 px-5 gap-2 font-semibold button-press hover:scale-105 hover:border-blue-400 hover:text-blue-600"
-          >
-            <Filter className="w-4 h-4" />
-            Filters
-            {hasActiveFilters && (
-              <span className="ml-1 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs rounded-full font-bold animate-pulse-glow">
-                {[selectedCategory, selectedBrand].filter(Boolean).length}
-              </span>
-            )}
-          </Button>
-        </div>
+        </section>
 
-        {showFilters && (
-          <div className="mb-8 p-6 bg-white rounded-2xl border border-border slide-up space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg font-semibold">Filters</h3>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-accent hover:text-accent/80 flex items-center gap-1 smooth-transition"
-                >
-                  <X className="w-4 h-4" />
-                  Clear all
-                </button>
-              )}
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <p className="text-sm font-medium mb-3 text-foreground">Category</p>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(selectedCategory === category.id ? null : category.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium smooth-transition ${
-                        selectedCategory === category.id
-                          ? 'bg-accent text-white'
-                          : 'bg-secondary text-secondary-foreground hover:bg-accent/10'
-                      }`}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium mb-3 text-foreground">Brand</p>
-                <div className="flex flex-wrap gap-2">
-                  {brands.map((brand) => (
-                    <button
-                      key={brand.id}
-                      onClick={() => setSelectedBrand(selectedBrand === brand.id ? null : brand.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium smooth-transition ${
-                        selectedBrand === brand.id
-                          ? 'bg-accent text-white'
-                          : 'bg-secondary text-secondary-foreground hover:bg-accent/10'
-                      }`}
-                    >
-                      {brand.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-{filteredProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-xl font-display text-muted-foreground mb-2">No products found</p>
-            <button
-              onClick={clearFilters}
-              className="text-accent hover:text-accent/80 smooth-transition"
-            >
-              Clear filters
-            </button>
+        {/* Dynamic Product Feeds */}
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-40 bg-secondary/30 rounded-lg">
+            <Search className="w-12 h-12 text-foreground/10 mx-auto mb-6" />
+            <h3 className="text-xl font-display font-bold text-foreground mb-2">No results matched your search</h3>
+            <p className="text-sm font-bold text-foreground/40 mb-8">Try searching for generic terms like "Mobile" or "TV"</p>
+            <Button onClick={() => { setSearchQuery(''); setSelectedCategory(null); }} className="font-bold bg-primary text-white px-10 rounded-sm">
+              Show All Products
+            </Button>
           </div>
         ) : (
           <>
@@ -328,99 +271,150 @@ export default function Home() {
               if (categoryProducts.length === 0) return null;
 
               return (
-                <div key={category.id} className="mb-16 pb-16 border-b border-border last:border-0 animate-fade-in-up">
-                  <div className="flex items-center justify-between mb-8 animate-slide-in-left">
+                <section key={category.id} className="mb-16 md:mb-24 last:mb-0">
+                  <div className="flex items-center justify-between mb-6 md:mb-10 pb-4 md:pb-6 border-b border-border">
                     <div>
-                      <h2 className="font-display text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                      <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground">
                         {category.name}
                       </h2>
-                      {category.description && (
-                        <p className="text-base text-muted-foreground mt-2 max-w-2xl">
-                          {category.description}
-                        </p>
-                      )}
+                      <p className="text-[10px] md:text-sm text-foreground/30 font-bold uppercase tracking-[2px] md:tracking-[3px] mt-1 md:mt-2">
+                        Curated Selection / {categoryProducts.length} Products
+                      </p>
                     </div>
-                    <span className="text-sm font-semibold px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 rounded-full border border-blue-200">
-                      {categoryProducts.length} {categoryProducts.length === 1 ? 'product' : 'products'}
-                    </span>
+                    <Link href="#" className="flex items-center gap-2 group text-[10px] md:text-xs font-bold uppercase tracking-widest text-primary">
+                      View All <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-                    {categoryProducts.map((product, index) => (
-                      <div
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    {categoryProducts.map((product) => (
+                      <ProductCard
                         key={product.id}
-                        className="stagger-item"
-                        style={{ animationDelay: `${index * 50}ms` }}
-                      >
-                        <ProductCard
-                          product={product}
-                          onWishlistToggle={toggleWishlist}
-                          isInWishlist={wishlist.has(product.id)}
-                        />
-                      </div>
+                        product={product}
+                        onWishlistToggle={toggleWishlist}
+                        isInWishlist={wishlist.has(product.id)}
+                      />
                     ))}
                   </div>
-                </div>
+                </section>
               );
             })}
           </>
         )}
 
-{wishlist.size > 0 && (
-          <div id="wishlist-section" className="border-t-2 border-gray-200 pt-20 pb-20 animate-fade-in-up">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 rounded-full mb-4 animate-scale-in">
-                <Heart className="w-4 h-4 fill-rose-500 text-rose-500 animate-pulse-glow" />
-                <span className="text-sm font-bold text-rose-700">Your Collection</span>
+        {/* Wishlist Center */}
+        {wishlist.size > 0 && (
+          <section id="wishlist-section" className="mt-40 pt-20 border-t-4 border-foreground">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+              <div>
+                <h2 className="font-display text-5xl font-bold text-foreground uppercase italic tracking-tighter">Your Bag <span className="text-primary block sm:inline">Favorites</span></h2>
+                <p className="text-foreground/40 font-bold uppercase tracking-widest text-sm mt-4">You have {wishlist.size} items securely saved for your next shopping session</p>
               </div>
-              <h2 className="font-display text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-rose-600 bg-clip-text text-transparent">
-                Your Wishlist
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                {wishlist.size} {wishlist.size === 1 ? 'item' : 'items'} saved for later
-              </p>
+              <div className="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center animate-pulse">
+                <Heart className="w-10 h-10 fill-rose-500 text-rose-500" />
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {products
                 .filter(p => wishlist.has(p.id))
-                .map((product, index) => (
-                  <div
+                .map((product) => (
+                  <ProductCard
                     key={product.id}
-                    className="stagger-item"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <ProductCard
-                      product={product}
-                      onWishlistToggle={toggleWishlist}
-                      isInWishlist={true}
-                    />
-                  </div>
+                    product={product}
+                    onWishlistToggle={toggleWishlist}
+                    isInWishlist={true}
+                  />
                 ))}
             </div>
-          </div>
+          </section>
         )}
       </div>
 
-      <footer className="border-t border-border bg-secondary/30 mt-20">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-accent rounded-lg flex items-center justify-center">
-                <span className="font-display text-white text-base font-semibold">T</span>
+      {/* Trust & Features Bar - Moved to bottom */}
+      <div className="bg-white border-y border-border py-12 md:py-16 mt-20 md:mt-32">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 grid grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-6">
+          {[
+            { icon: <Zap className="w-6 h-6 md:w-8 md:h-8" />, title: "Instant Access", desc: "Buy direct from verified brands" },
+            { icon: <ShieldCheck className="w-6 h-6 md:w-8 md:h-8" />, title: "Verified Store", desc: "100% Genuine product guarantee" },
+            { icon: <Star className="w-6 h-6 md:w-8 md:h-8" />, title: "Premium Quality", desc: "Hand-picked curated selections" },
+            { icon: <ShoppingBag className="w-6 h-6 md:w-8 md:h-8" />, title: "Easy Returns", desc: "Hassle-free 30-day refund policy" }
+          ].map((feature, i) => (
+            <div key={i} className="flex flex-col items-center text-center gap-4 md:gap-6 group">
+              <div className="w-14 h-14 md:w-20 md:h-20 bg-secondary flex items-center justify-center rounded-sm transition-all duration-500 group-hover:bg-primary group-hover:text-white text-foreground/40 shrink-0 transform group-hover:rotate-6">
+                {feature.icon}
               </div>
               <div>
-                <h3 className="font-display text-lg font-semibold">TechDiscover</h3>
-                <p className="text-xs text-muted-foreground">Discover innovative tech</p>
+                <h4 className="text-xs md:text-sm font-bold uppercase tracking-widest text-foreground mb-2">{feature.title}</h4>
+                <p className="text-[10px] md:text-xs font-bold text-foreground/30 uppercase tracking-tighter leading-relaxed max-w-[200px]">{feature.desc}</p>
               </div>
             </div>
-            <div className="text-center md:text-right">
-              <p className="text-sm text-muted-foreground mb-1">
-                Curated electronics from the best D2C brands
+          ))}
+        </div>
+      </div>
+
+      {/* Robust Market Footer */}
+      <footer className="bg-white border-t border-border pt-32 pb-12 mt-40">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-16 mb-24">
+            <div className="col-span-2">
+              <Link href="/" className="flex items-center gap-2 mb-8">
+                <div className="w-10 h-10 bg-primary rounded-sm flex items-center justify-center">
+                  <span className="text-white font-bold text-2xl italic">D</span>
+                </div>
+                <span className="font-display text-3xl font-bold tracking-tighter text-foreground">D2C<span className="text-primary">store</span></span>
+              </Link>
+              <p className="text-base text-foreground/50 leading-relaxed max-w-sm mb-10 font-medium">
+                The world's most trusted marketplace for verified Direct-to-Consumer tech. We skip the middleman, you get the absolute best flagship tech at honest prices.
               </p>
-              <p className="text-xs text-muted-foreground">
-                All purchases redirect to official brand websites
-              </p>
+              <div className="flex gap-4">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="w-10 h-10 bg-secondary border border-border flex items-center justify-center hover:bg-primary transition-all group cursor-pointer">
+                    <div className="w-4 h-4 bg-foreground/20 group-hover:bg-white rounded-full" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-xs uppercase tracking-[2px] text-foreground mb-10">Store Directory</h4>
+              <ul className="space-y-5 text-sm font-bold text-foreground/50">
+                <li><Link href="#" className="hover:text-primary transition-colors">Smartphone Hub</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Video & TV Center</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Audio Professional</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">PC & Laptop Depot</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-xs uppercase tracking-[2px] text-foreground mb-10">Service Links</h4>
+              <ul className="space-y-5 text-sm font-bold text-foreground/50">
+                <li><Link href="#" className="hover:text-primary transition-colors">Track My Order</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Return Policy</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Help Center</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Verified Program</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-xs uppercase tracking-[2px] text-foreground mb-10">Marketplace</h4>
+              <ul className="space-y-5 text-sm font-bold text-foreground/50">
+                <li><Link href="#" className="hover:text-primary transition-colors">Partner With Us</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Our Story</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Careers</Link></li>
+                <li><Link href="#" className="hover:text-primary transition-colors">Press & Media</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-12 flex flex-col md:flex-row justify-between items-center gap-8">
+            <p className="text-[11px] font-bold text-foreground/30 uppercase tracking-[2px]">
+              © 2025 D2Cstore GLOBAL MARKETPLACE. NO MIDDLEMAN. NO UPCHARGES.
+            </p>
+            <div className="flex gap-10 text-[11px] font-bold text-foreground/30 uppercase tracking-[2px]">
+              <Link href="#" className="hover:text-foreground transition-colors">Legal</Link>
+              <Link href="#" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link href="#" className="hover:text-foreground transition-colors">Compliance</Link>
             </div>
           </div>
         </div>

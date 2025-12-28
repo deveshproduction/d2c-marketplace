@@ -2,12 +2,13 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'TechDiscover - Find the Best Electronics from D2C Brands',
-  description: 'Discover curated electronics from innovative direct-to-consumer brands. Explore Framework, Nothing, Teenage Engineering, and more.',
+  metadataBase: new URL('https://d2c-marketplace-demo.vercel.app'), // Placeholder URL for resolving assets
+  title: 'D2Cstore | Discovery',
+  description: 'The world\'s most trusted universal marketplace for verified Direct-to-Consumer products. Discovery curated favorites directly from brands.',
   openGraph: {
     images: [
       {
-        url: 'https://bolt.new/static/og_default.png',
+        url: '/og-image.png',
       },
     ],
   },
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     images: [
       {
-        url: 'https://bolt.new/static/og_default.png',
+        url: '/og-image.png',
       },
     ],
   },
